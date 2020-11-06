@@ -2,8 +2,8 @@
     Searches deep inside a directory structure, looking for duplicate file.
     Duplicates aka copies have the same content, but not necessarily the same name.
 """
-__author__ = ""
-__email__ = ""
+__author__ = "Andrew Francis"
+__email__ = "franca17@my.erau.edu"
 __version__ = "1.0"
 
 # noinspection PyUnresolvedReferences
@@ -27,9 +27,11 @@ def search(file_list):
     each of those lists contains files that have the same content
     """
     lol = []
-    #
-    # ...
-    #
+    while 0 < len(file_list):
+        dups = [x for x in file_list if compare(file_list[0], x)]
+        if 1 < len(dups):
+            lol.append(dups)
+        file_list = [x for x in file_list if not compare(file_list[0], x)]
     return lol
 
 
@@ -40,10 +42,16 @@ def faster_search(file_list):
     Here's an idea: executing the compare() function seems to take a lot of time.
     Therefore, let's optimize and try to call it a little less often.
     """
+    # sort these by size and then run an if statement to compare them only if they are the same size
     lol = []
-    #
-    # ...
-    #
+    while 0 < len(file_list):
+        dups = [file_list.pop(0)]
+        for i in range(len(file_list) - 1, -1, -1):
+            if compare(dups[0], file_list[i]):
+                dups.append(file_list[i])
+        if 1 < len(dups):
+            lol.append(dups)
+
     return lol
 
 
@@ -56,10 +64,20 @@ def report(lol):
     - list where the items require the largest amount or disk-space
     """
     print("== == Duplicate File Finder Report == ==")
-    # if .... :
+    # most dups
+
+    print(f"Max: {max(lol, key=lambda x: len(x) * len(x[0]))}"
+          f"\nMax Duplicates: {max(lol, key=lambda x: len(x))} ")
+    return
+
     #
     # else:
     #     print("No duplicates found")
+
+
+print(search(all_files("images")))
+
+print(faster_search(all_files("images")))
 
 
 if __name__ == '__main__':
