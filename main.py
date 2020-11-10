@@ -26,21 +26,14 @@ def search(file_list):
     As a result we have a list, each item of that list is a list,
     each of those lists contains files that have the same content
     """
-    # lol = []
-    # while 0 < len(file_list):
-    #     dups = [x for x in file_list if compare(file_list[0], x)]
-    #     if 1 < len(dups):
-    #         lol.append(dups)
-    #     file_list = [x for x in file_list if not compare(file_list[0], x)]
-    # return lol
-    lol = []
-    while 0 < len(file_list):
-        dups = [file_list.pop(0)]
+    lol = []  # initialize my list of lists
+    while 0 < len(file_list):  # will continue to run until i pop all of my files
+        dups = [file_list.pop(0)]  # initializing my list for adding duplicates
         for i in range(len(file_list) - 1, -1, -1):
             if compare(dups[0], file_list[i]):
                 dups.append(file_list[i])
         if 1 < len(dups):
-            lol.append(dups)
+            lol.append(dups)  # adding my duplicates to the list of list
 
     return lol
 
@@ -52,18 +45,19 @@ def faster_search(file_list):
     Here's an idea: executing the compare() function seems to take a lot of time.
     Therefore, let's optimize and try to call it a little less often.
     """
-    # sort these by size and then run an if statement to compare them only if they are the same size
-    lol = []
-    while 0 < len(file_list):
-        file_sizes = list(map(getsize, file_list))
-        filter(lambda x: 1 < file_sizes.count(getsize(x)), file_list)
-        dups = [file_list.pop(0)]
-        for i in range(len(file_list) - 1, -1, -1):
-            if compare(dups[0], file_list[i]):
-                dups.append(file_list[i])
-        if 1 < len(dups):
-            lol.append(dups)
 
+    lol = []
+    # filter my file list to reduce the amount of times compare is called
+    file_sizes = list(map(getsize, file_list))
+    filtered_files = list(filter(lambda x: 1 < file_sizes.count(getsize(x)), file_list))
+
+    while 1 < len(filtered_files):
+        dups = [filtered_files.pop(0)]
+        for i in range(len(filtered_files) - 1, -1, -1):
+            if compare(filtered_files[i], dups[0]):
+                dups.append(filtered_files[i])
+        if 1 < len(dups):
+            lol.extend([dups])
     return lol
 
 
@@ -79,13 +73,17 @@ def report(lol):
     # most dups
     m = max(lol, key=lambda x: len(x))
     print(f"File with the most duplicates: {m.pop(0)}")
-    print(f"It has {len(m)} duplicates: {m}")
+    print(f"It has {len(m)} duplicates:")
+    for d in m:
+        print(d)
 
     # most disk space
     m = max(lol, key=lambda x: len(x) * getsize(x[0]))
 
     print(f"\nFile that takes the most disk space: {m.pop(0)}")
-    print(f"It has {len(m)} duplicates: {m}")
+    print(f"It has {len(m)} duplicates:")
+    for d in m:
+        print(d)
     print(f"It and its duplicates take up {(len(m) + 1) * getsize(m[0])} disk space")
 
     return
